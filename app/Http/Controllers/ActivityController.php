@@ -35,7 +35,11 @@ class ActivityController extends Controller
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string',
                 'type' => 'required|in:course,project,book,practice,certification,other',
-                'skill_id' => 'required|integer|exists:skills,id',
+                'skill_id' => [
+                    'required',
+                    'integer',
+                    'exists:skills,id,user_id,' . Auth::id()
+                ],
                 'url' => 'nullable|url',
                 'status' => 'nullable|in:not_started,in_progress,completed,paused',
                 'start_date' => 'nullable|date',
@@ -46,19 +50,26 @@ class ActivityController extends Controller
                 'position_x' => 'nullable|numeric',
                 'position_y' => 'nullable|numeric',
                 'dependencies' => 'nullable|array',
-                'dependencies.*' => 'integer|exists:activities,id',
+                'dependencies.*' => [
+                    'integer',
+                    'exists:activities,id,user_id,' . Auth::id()
+                ],
             ]);
-
-            // Check that skill belongs to user
-            $skill = Skill::findOrFail($request->skill_id);
-            $this->authorize('view', $skill);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
         } catch (\Exception $e) {
-            \Log::error('Activity creation validation/authorization error:', [
+            \Log::error('Activity creation error:', [
                 'error' => $e->getMessage(),
                 'request_data' => $request->all(),
                 'user_id' => Auth::id()
             ]);
-            throw $e;
+            return response()->json([
+                'message' => 'An error occurred while creating the activity',
+                'error' => $e->getMessage()
+            ], 500);
         }
 
         DB::transaction(function () use ($request, &$activity) {
@@ -111,26 +122,52 @@ class ActivityController extends Controller
     {
         $this->authorize('update', $activity);
 
-        $request->validate([
-            'name' => 'string|max:255',
-            'description' => 'nullable|string',
-            'type' => 'in:course,project,book,practice,certification,other',
-            'url' => 'nullable|url',
-            'status' => 'in:not_started,in_progress,completed,paused',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-            'estimated_hours' => 'nullable|integer|min:0',
-            'actual_hours' => 'nullable|integer|min:0',
-            'metadata' => 'nullable|json',
-            'position_x' => 'nullable|numeric',
-            'position_y' => 'nullable|numeric',
-            'dependencies' => 'nullable|array',
-            'dependencies.*' => 'exists:activities,id',
-        ]);
+        try {
+            $request->validate([
+                'name' => 'string|max:255',
+                'description' => 'nullable|string',
+                'type' => 'in:course,project,book,practice,certification,other',
+                'skill_id' => [
+                    'nullable',
+                    'integer',
+                    'exists:skills,id,user_id,' . Auth::id()
+                ],
+                'url' => 'nullable|url',
+                'status' => 'in:not_started,in_progress,completed,paused',
+                'start_date' => 'nullable|date',
+                'end_date' => 'nullable|date|after_or_equal:start_date',
+                'estimated_hours' => 'nullable|integer|min:0',
+                'actual_hours' => 'nullable|integer|min:0',
+                'metadata' => 'nullable|json',
+                'position_x' => 'nullable|numeric',
+                'position_y' => 'nullable|numeric',
+                'dependencies' => 'nullable|array',
+                'dependencies.*' => [
+                    'integer',
+                    'exists:activities,id,user_id,' . Auth::id()
+                ],
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('Activity update error:', [
+                'error' => $e->getMessage(),
+                'request_data' => $request->all(),
+                'user_id' => Auth::id(),
+                'activity_id' => $activity->id
+            ]);
+            return response()->json([
+                'message' => 'An error occurred while updating the activity',
+                'error' => $e->getMessage()
+            ], 500);
+        }
 
         DB::transaction(function () use ($request, $activity) {
             $activity->update($request->only([
-                'name', 'description', 'type', 'url', 'status',
+                'name', 'description', 'type', 'skill_id', 'url', 'status',
                 'start_date', 'end_date', 'estimated_hours', 'actual_hours',
                 'metadata', 'position_x', 'position_y'
             ]));
@@ -160,7 +197,19 @@ class ActivityController extends Controller
     {
         $this->authorize('delete', $activity);
 
-        $activity->delete();
+        try {
+            $activity->delete();
+        } catch (\Exception $e) {
+            \Log::error('Activity deletion error:', [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id(),
+                'activity_id' => $activity->id
+            ]);
+            return response()->json([
+                'message' => 'An error occurred while deleting the activity',
+                'error' => $e->getMessage()
+            ], 500);
+        }
 
         return response()->json(null, 204);
     }
@@ -169,10 +218,28 @@ class ActivityController extends Controller
     {
         $this->authorize('update', $activity);
 
-        $request->validate([
-            'position_x' => 'required|numeric',
-            'position_y' => 'required|numeric',
-        ]);
+        try {
+            $request->validate([
+                'position_x' => 'required|numeric',
+                'position_y' => 'required|numeric',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('Activity position update error:', [
+                'error' => $e->getMessage(),
+                'request_data' => $request->all(),
+                'user_id' => Auth::id(),
+                'activity_id' => $activity->id
+            ]);
+            return response()->json([
+                'message' => 'An error occurred while updating the activity position',
+                'error' => $e->getMessage()
+            ], 500);
+        }
 
         $activity->update([
             'position_x' => $request->position_x,

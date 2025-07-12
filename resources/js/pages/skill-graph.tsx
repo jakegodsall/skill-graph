@@ -263,9 +263,9 @@ export default function SkillGraph() {
     <AppLayout>
       <Head title="Skill Graph" />
       
-      <div className="space-y-6">
+      <div className="h-[calc(100vh-theme(spacing.16))] flex flex-col space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-shrink-0">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Skill Graph</h1>
             <p className="text-gray-600">Visualize your learning journey and skill dependencies</p>
@@ -302,7 +302,7 @@ export default function SkillGraph() {
         </div>
 
         {/* Skills Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 flex-shrink-0">
           {skills.map((skill) => (
             <Card key={skill.id} className="cursor-pointer hover:shadow-md transition-shadow">
               <CardHeader className="pb-3">
@@ -325,7 +325,7 @@ export default function SkillGraph() {
         </div>
 
         {/* React Flow Graph */}
-        <Card className="h-96">
+        <Card className="flex-1 min-h-0">
           <CardContent className="p-0 h-full">
             <ReactFlow
               nodes={nodes}
