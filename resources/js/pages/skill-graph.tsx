@@ -31,28 +31,7 @@ import CertificationNode from '@/components/flow-nodes/certification-node';
 import OtherNode from '@/components/flow-nodes/other-node';
 import SkillNode from '@/components/flow-nodes/skill-node';
 
-interface Skill {
-  id: number;
-  name: string;
-  description?: string;
-  color: string;
-  activities_count: number;
-}
 
-interface Activity {
-  id: number;
-  name: string;
-  description?: string;
-  type: 'course' | 'project' | 'book' | 'practice' | 'certification' | 'other';
-  status: 'not_started' | 'in_progress' | 'completed' | 'paused';
-  url?: string;
-  position_x?: number;
-  position_y?: number;
-  skill_id: number;
-  skill: Skill;
-  depends_on: Activity[];
-  required_by: Activity[];
-}
 
 const nodeTypes: NodeTypes = {
   skill: SkillNode,
@@ -85,12 +64,14 @@ const getStatusColor = (status: Activity['status']) => {
 };
 
 export default function SkillGraph() {
+  const [selectedSkill, setSelectedSkill] = useState<string>('all');
   const [skills, setSkills] = useState<Skill[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
-  const [selectedSkill, setSelectedSkill] = useState<string>('all');
+  
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const [loading, setLoading] = useState(true);
+
+  const [loading, setLoading] = useState<boolean>(true);
 
   // Fetch skills
   const fetchSkills = useCallback(async () => {
@@ -103,7 +84,6 @@ export default function SkillGraph() {
     }
   }, []);
 
-  // Fetch activities
   const fetchActivities = useCallback(async () => {
     try {
       const url = selectedSkill === 'all' ? '/api/activities' : `/api/activities?skill_id=${selectedSkill}`;
@@ -115,24 +95,20 @@ export default function SkillGraph() {
     }
   }, [selectedSkill]);
 
-  // Convert activities to nodes and edges
   const convertToNodesAndEdges = useCallback(() => {
-    // Get unique skills from activities
     const uniqueSkills = Array.from(
       new Map(activities.map(activity => [activity.skill_id, activity.skill])).values()
     );
 
-    // Create skill nodes
     const skillNodes: Node[] = uniqueSkills.map((skill, index) => {
       const skillActivities = activities.filter(activity => activity.skill_id === skill.id);
       
-      // Position skill nodes in a column on the left side
       return {
         id: `skill-${skill.id}`,
         type: 'skill',
         position: {
           x: 50,
-          y: 50 + (index * 250), // Space skill nodes vertically
+          y: 50 + (index * 250),
         },
         data: {
           ...skill,
@@ -149,7 +125,7 @@ export default function SkillGraph() {
         id: activity.id.toString(),
         type: activity.type,
         position: {
-          x: activity.position_x || (300 + Math.random() * 300), // Position to the right of skill nodes
+          x: activity.position_x || (300 + Math.random() * 300),
           y: activity.position_y || (50 + (skillIndex * 250) + Math.random() * 200),
         },
         data: {
@@ -161,10 +137,8 @@ export default function SkillGraph() {
       };
     });
 
-    // Create edges
     const newEdges: Edge[] = [];
 
-    // Add activity dependency edges
     activities.forEach((activity) => {
       activity.depends_on.forEach((dependency) => {
         newEdges.push({
@@ -178,7 +152,6 @@ export default function SkillGraph() {
       });
     });
 
-    // Add skill-to-activity edges for activities with no dependencies
     activities.forEach((activity) => {
       if (activity.depends_on.length === 0) {
         newEdges.push({
@@ -200,10 +173,8 @@ export default function SkillGraph() {
     setEdges(newEdges);
   }, [activities, setNodes, setEdges]);
 
-  // Handle node drag end (save position)
   const onNodeDragStop = useCallback(
     async (event: React.MouseEvent, node: Node) => {
-      // Only save positions for activity nodes, not skill nodes
       if (node.id.startsWith('skill-')) {
         return;
       }

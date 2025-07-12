@@ -22,19 +22,19 @@ export default function AppLogoIcon(props: SVGAttributes<SVGElement>) {
                 />
                 <g>
                     <path d="M5.5,20.5 L26.228,5.5" fill="#000000" />
-                    <path d="M5.5,20.5 L26.228,5.5" fill-opacity="0" stroke="#4F46E5" stroke-width="2" />
+                    <path d="M5.5,20.5 L26.228,5.5" fillOpacity="0" stroke="#4F46E5" strokeWidth="2" />
                 </g>
                 <g>
                     <path d="M5.5,20.5 L26.228,35.5" fill="#000000" />
-                    <path d="M5.5,20.5 L26.228,35.5" fill-opacity="0" stroke="#4F46E5" stroke-width="2" />
+                    <path d="M5.5,20.5 L26.228,35.5" fillOpacity="0" stroke="#4F46E5" strokeWidth="2" />
                 </g>
                 <g>
                     <path d="M26.228,5.5 L46.957,20.5" fill="#000000" />
-                    <path d="M26.228,5.5 L46.957,20.5" fill-opacity="0" stroke="#4F46E5" stroke-width="2" />
+                    <path d="M26.228,5.5 L46.957,20.5" fillOpacity="0" stroke="#4F46E5" strokeWidth="2" />
                 </g>
                 <g>
                     <path d="M26.228,35.5 L46.957,20.5" fill="#000000" />
-                    <path d="M26.228,35.5 L46.957,20.5" fill-opacity="0" stroke="#4F46E5" stroke-width="2" />
+                    <path d="M26.228,35.5 L46.957,20.5" fillOpacity="0" stroke="#4F46E5" strokeWidth="2" />
                 </g>
             </g>
         </svg>
