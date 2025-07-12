@@ -38,7 +38,6 @@ services:
       - mysql-data:/var/lib/mysql
     networks:
       - skill-graph-network
-    command: --default-authentication-plugin=mysql_native_password
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
@@ -55,19 +54,6 @@ services:
       - skill-graph-network
     depends_on:
       - mysql
-
-  node:
-    image: node:18-alpine
-    container_name: skill-graph-node
-    restart: unless-stopped
-    working_dir: /var/www/html
-    volumes:
-      - ./:/var/www/html
-    networks:
-      - skill-graph-network
-    ports:
-      - "5173:5173"
-    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
 
 volumes:
   mysql-data:
