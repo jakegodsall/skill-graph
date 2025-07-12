@@ -1,0 +1,24 @@
+import FlowDiagram from '@/components/flow-diagram';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
+import { Head } from '@inertiajs/react';
+
+import '@xyflow/react/dist/style.css';
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Dashboard',
+        href: '/dashboard',
+    },
+];
+
+export default function Dashboard() {
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Dashboard" />
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+                <FlowDiagram />
+            </div>
+        </AppLayout>
+    );
+}
