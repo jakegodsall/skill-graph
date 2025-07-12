@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Activity;
 use App\Models\ActivityDependency;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -13,7 +14,7 @@ use Illuminate\Validation\ValidationException;
 
 class ActivityController extends Controller
 {
-    // Authentication handled by web middleware group
+    use AuthorizesRequests;
 
     public function index(Request $request)
     {
@@ -73,6 +74,7 @@ class ActivityController extends Controller
             ], 500);
         }
 
+
         DB::transaction(function () use ($request, &$activity) {
             $activity = Auth::user()->activities()->create([
                 'name' => $request->name,
@@ -120,6 +122,10 @@ class ActivityController extends Controller
     public function update(Request $request, Activity $activity)
     {
         $this->authorize('update', $activity);
+
+
+        Log::info('working up to here');
+
 
         try {
             $request->validate([

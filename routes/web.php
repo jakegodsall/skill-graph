@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\Api\ActivityController;
+use App\Http\Controllers\Api\SkillController;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
@@ -25,6 +27,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('activities.index');
     
 });
+
+Route::prefix('api')->group(function () {
+    Route::apiResource('skills', SkillController::class);
+    Route::apiResource('activities', ActivityController::class);
+    Route::patch('activities/{activity}/position', [ActivityController::class, 'updatePosition']);
+});
+
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
