@@ -1,321 +1,318 @@
-import React, { useState, useEffect, useCallback } from 'react';
 import { Head, router } from '@inertiajs/react';
+import React, { act, useCallback, useEffect, useState } from 'react';
 import {
-  ReactFlow,
-  MiniMap,
-  Controls,
-  Background,
-  useNodesState,
-  useEdgesState,
-  addEdge,
-  Connection,
-  Edge,
-  Node,
-  NodeTypes,
-  BackgroundVariant,
+    addEdge,
+    Background,
+    BackgroundVariant,
+    Connection,
+    Controls,
+    Edge,
+    MiniMap,
+    Node,
+    NodeTypes,
+    ReactFlow,
+    useEdgesState,
+    useNodesState,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-import AppLayout from '@/layouts/app-layout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, BookOpen, Code, Award, FileText, Target, Zap, Settings } from 'lucide-react';
+import AppLayout from '@/layouts/app-layout';
+import { Award, BookOpen, Code, FileText, Plus, Settings, Target, Zap } from 'lucide-react';
 
-import CourseNode from '@/components/flow-nodes/course-node';
-import ProjectNode from '@/components/flow-nodes/project-node';
 import BookNode from '@/components/flow-nodes/book-node';
-import PracticeNode from '@/components/flow-nodes/practice-node';
 import CertificationNode from '@/components/flow-nodes/certification-node';
+import CourseNode from '@/components/flow-nodes/course-node';
 import OtherNode from '@/components/flow-nodes/other-node';
+import PracticeNode from '@/components/flow-nodes/practice-node';
+import ProjectNode from '@/components/flow-nodes/project-node';
 import SkillNode from '@/components/flow-nodes/skill-node';
 
-
-
 const nodeTypes: NodeTypes = {
-  skill: SkillNode,
-  course: CourseNode,
-  project: ProjectNode,
-  book: BookNode,
-  practice: PracticeNode,
-  certification: CertificationNode,
-  other: OtherNode,
+    skill: SkillNode,
+    course: CourseNode,
+    project: ProjectNode,
+    book: BookNode,
+    practice: PracticeNode,
+    certification: CertificationNode,
+    other: OtherNode,
 };
 
 const getNodeIcon = (type: Activity['type']) => {
-  switch (type) {
-    case 'course': return <BookOpen className="w-4 h-4" />;
-    case 'project': return <Code className="w-4 h-4" />;
-    case 'book': return <FileText className="w-4 h-4" />;
-    case 'practice': return <Target className="w-4 h-4" />;
-    case 'certification': return <Award className="w-4 h-4" />;
-    case 'other': return <Zap className="w-4 h-4" />;
-  }
+    switch (type) {
+        case 'course':
+            return <BookOpen className="h-4 w-4" />;
+        case 'project':
+            return <Code className="h-4 w-4" />;
+        case 'book':
+            return <FileText className="h-4 w-4" />;
+        case 'practice':
+            return <Target className="h-4 w-4" />;
+        case 'certification':
+            return <Award className="h-4 w-4" />;
+        case 'other':
+            return <Zap className="h-4 w-4" />;
+    }
 };
 
 const getStatusColor = (status: Activity['status']) => {
-  switch (status) {
-    case 'not_started': return 'bg-gray-100 text-gray-800';
-    case 'in_progress': return 'bg-blue-100 text-blue-800';
-    case 'completed': return 'bg-green-100 text-green-800';
-    case 'paused': return 'bg-yellow-100 text-yellow-800';
-  }
+    switch (status) {
+        case 'not_started':
+            return 'bg-gray-100 text-gray-800';
+        case 'in_progress':
+            return 'bg-blue-100 text-blue-800';
+        case 'completed':
+            return 'bg-green-100 text-green-800';
+        case 'paused':
+            return 'bg-yellow-100 text-yellow-800';
+    }
 };
 
 export default function SkillGraph() {
-  const [selectedSkill, setSelectedSkill] = useState<string>('all');
-  const [skills, setSkills] = useState<Skill[]>([]);
-  const [activities, setActivities] = useState<Activity[]>([]);
-  
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+    const [selectedSkill, setSelectedSkill] = useState<string>('all');
+    const [skills, setSkills] = useState<Skill[]>([]);
+    const [activities, setActivities] = useState<Activity[]>([]);
 
-  const [loading, setLoading] = useState<boolean>(true);
+    const [nodes, setNodes, onNodesChange] = useNodesState([]);
+    const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-  // Fetch skills
-  const fetchSkills = useCallback(async () => {
-    try {
-      const response = await fetch('/api/skills');
-      const data = await response.json();
-      setSkills(data);
-    } catch (error) {
-      console.error('Error fetching skills:', error);
-    }
-  }, []);
+    const [loading, setLoading] = useState<boolean>(true);
 
-  const fetchActivities = useCallback(async () => {
-    try {
-      const url = selectedSkill === 'all' ? '/api/activities' : `/api/activities?skill_id=${selectedSkill}`;
-      const response = await fetch(url);
-      const data = await response.json();
-      setActivities(data);
-    } catch (error) {
-      console.error('Error fetching activities:', error);
-    }
-  }, [selectedSkill]);
+    // Fetch skills
+    const fetchSkills = useCallback(async () => {
+        try {
+            const response = await fetch('/api/skills');
+            const data = await response.json();
+            setSkills(data);
+        } catch (error) {
+            console.error('Error fetching skills:', error);
+        }
+    }, []);
 
-  const convertToNodesAndEdges = useCallback(() => {
-    const uniqueSkills = Array.from(
-      new Map(activities.map(activity => [activity.skill_id, activity.skill])).values()
-    );
+    const fetchActivities = useCallback(async () => {
+        try {
+            const url = selectedSkill === 'all' ? '/api/activities' : `/api/activities?skill_id=${selectedSkill}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            setActivities(data);
+        } catch (error) {
+            console.error('Error fetching activities:', error);
+        }
+    }, [selectedSkill]);
 
-    const skillNodes: Node[] = uniqueSkills.map((skill, index) => {
-      const skillActivities = activities.filter(activity => activity.skill_id === skill.id);
-      
-      return {
-        id: `skill-${skill.id}`,
-        type: 'skill',
-        position: {
-          x: 50,
-          y: 50 + (index * 250),
-        },
-        data: {
-          ...skill,
-          activities_count: skillActivities.length,
-        },
-      };
-    });
+    const convertToNodesAndEdges = useCallback(() => {
+        const uniqueSkills = Array.from(new Map(activities.map((activity) => [activity.skill_id, activity.skill])).values());
 
-    // Create activity nodes
-    const activityNodes: Node[] = activities.map((activity, index) => {
-      const skillIndex = uniqueSkills.findIndex(skill => skill.id === activity.skill_id);
-      
-      return {
-        id: activity.id.toString(),
-        type: activity.type,
-        position: {
-          x: activity.position_x || (300 + Math.random() * 300),
-          y: activity.position_y || (50 + (skillIndex * 250) + Math.random() * 200),
-        },
-        data: {
-          ...activity,
-          label: activity.name,
-          icon: getNodeIcon(activity.type),
-          statusColor: getStatusColor(activity.status),
-        },
-      };
-    });
+        const skillNodes: Node[] = uniqueSkills.map((skill, index) => {
+            const skillActivities = activities.filter((activity) => activity.skill_id === skill.id);
 
-    const newEdges: Edge[] = [];
-
-    activities.forEach((activity) => {
-      activity.depends_on.forEach((dependency) => {
-        newEdges.push({
-          id: `${dependency.id}-${activity.id}`,
-          source: dependency.id.toString(),
-          target: activity.id.toString(),
-          type: 'smoothstep',
-          animated: activity.status === 'in_progress',
-          style: { stroke: activity.skill.color },
+            return {
+                id: `skill-${skill.id}`,
+                type: 'skill',
+                position: {
+                    x: 50,
+                    y: 50 + index * 250,
+                },
+                data: {
+                    ...skill,
+                    activities_count: skillActivities.length,
+                },
+            };
         });
-      });
-    });
 
-    activities.forEach((activity) => {
-      if (activity.depends_on.length === 0) {
-        newEdges.push({
-          id: `skill-${activity.skill_id}-${activity.id}`,
-          source: `skill-${activity.skill_id}`,
-          target: activity.id.toString(),
-          type: 'smoothstep',
-          animated: activity.status === 'in_progress',
-          style: { 
-            stroke: activity.skill.color,
-            strokeWidth: 3, // Make skill connections more prominent
-            strokeDasharray: '5,5', // Dashed line to distinguish from activity dependencies
-          },
+        const activityNodes: Node[] = activities.map((activity) => {
+            const skillIndex = uniqueSkills.findIndex((skill) => skill.id === activity.skill_id);
+
+            return {
+                id: activity.id.toString(),
+                type: activity.type,
+                position: {
+                    x: activity.position_x || 300 + Math.random() * 500,
+                    y: activity.position_y || 50 + skillIndex * 250 + Math.random() * 200,
+                },
+                data: {
+                    ...activity,
+                    label: activity.name,
+                    icon: getNodeIcon(activity.type),
+                    statusColor: getStatusColor(activity.status),
+                },
+            };
         });
-      }
-    });
 
-    setNodes([...skillNodes, ...activityNodes]);
-    setEdges(newEdges);
-  }, [activities, setNodes, setEdges]);
+        const newEdges: Edge[] = [];
 
-  const onNodeDragStop = useCallback(
-    async (event: React.MouseEvent, node: Node) => {
-      if (node.id.startsWith('skill-')) {
-        return;
-      }
-
-      try {
-        await fetch(`/api/activities/${node.id}/position`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-          },
-          body: JSON.stringify({
-            position_x: node.position.x,
-            position_y: node.position.y,
-          }),
+        activities.forEach((activity) => {
+            activity.depends_on.forEach((dependency) => {
+                newEdges.push({
+                    id: `${dependency.id}-${activity.id}`,
+                    source: dependency.id.toString(),
+                    target: activity.id.toString(),
+                    type: 'smoothstep',
+                    animated: activity.status === 'in_progress',
+                    style: { stroke: activity.skill.color },
+                });
+            });
         });
-      } catch (error) {
-        console.error('Error saving node position:', error);
-      }
-    },
-    []
-  );
 
-  // Load data on component mount
-  useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      await fetchSkills();
-      await fetchActivities();
-      setLoading(false);
-    };
-    loadData();
-  }, [fetchSkills, fetchActivities]);
+        activities.forEach((activity) => {
+            if (activity.depends_on.length === 0) {
+                newEdges.push({
+                    id: `skill-${activity.skill_id}-${activity.id}`,
+                    source: `skill-${activity.skill_id}`,
+                    target: activity.id.toString(),
+                    type: 'smoothstep',
+                    animated: activity.status === 'in_progress',
+                    style: {
+                        stroke: activity.skill.color,
+                        strokeWidth: 3,
+                    },
+                });
+            }
+        });
 
-  // Convert activities to nodes and edges when activities change
-  useEffect(() => {
-    convertToNodesAndEdges();
-  }, [convertToNodesAndEdges]);
+        console.log(skillNodes, activityNodes, newEdges);
 
-  const onConnect = useCallback(
-    (params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges]
-  );
+        setNodes([...skillNodes, ...activityNodes]);
+        setEdges(newEdges);
+    }, [activities, setNodes, setEdges]);
 
-  if (loading) {
-    return (
-      <AppLayout>
-        <Head title="Skill Graph" />
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-        </div>
-      </AppLayout>
-    );
-  }
-
-  return (
-    <AppLayout>
-      <Head title="Skill Graph" />
+    const onNodeDragStop = useCallback(async (event: React.MouseEvent, node: Node) => {
+        let entity = '';
       
-      <div className="h-[calc(100vh-theme(spacing.16))] flex flex-col space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between flex-shrink-0">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Skill Graph</h1>
-            <p className="text-gray-600">Visualize your learning journey and skill dependencies</p>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Select value={selectedSkill} onValueChange={setSelectedSkill}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Select skill" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Skills</SelectItem>
-                {skills.map((skill) => (
-                  <SelectItem key={skill.id} value={skill.id.toString()}>
-                    <div className="flex items-center space-x-2">
-                      <div
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: skill.color }}
-                      />
-                      <span>{skill.name}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button onClick={() => router.visit('/skills')}>
-              <Settings className="w-4 h-4 mr-2" />
-              Manage Skills
-            </Button>
-            <Button onClick={() => router.visit('/activities')}>
-              <Plus className="w-4 h-4 mr-2" />
-              Manage Activities
-            </Button>
-          </div>
-        </div>
+        if (node.id.startsWith('skill-')) {
+            entity = 'skills';
+        } else {
+          entity = 'activities';
+        }
 
-        {/* Skills Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 flex-shrink-0">
-          {skills.map((skill) => (
-            <Card key={skill.id} className="cursor-pointer hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div
-                    className="w-4 h-4 rounded-full"
-                    style={{ backgroundColor: skill.color }}
-                  />
-                  <Badge variant="secondary">{skill.activities_count}</Badge>
+        try {
+            await fetch(`/api/${entity}/${node.id}/position`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                },
+                body: JSON.stringify({
+                    position_x: node.position.x,
+                    position_y: node.position.y,
+                }),
+            });
+        } catch (error) {
+            console.error('Error saving node position:', error);
+        }
+
+        console.log(activities, edges);
+    }, [activities, edges]);
+
+    useEffect(() => {
+        const loadData = async () => {
+            setLoading(true);
+            await fetchSkills();
+            await fetchActivities();
+            setLoading(false);
+        };
+        loadData();
+    }, [fetchSkills, fetchActivities]);
+
+    useEffect(() => {
+        convertToNodesAndEdges();
+    }, [convertToNodesAndEdges]);
+
+    const onConnect = useCallback((params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
+
+    if (loading) {
+        return (
+            <AppLayout>
+                <Head title="Skill Graph" />
+                <div className="flex h-64 items-center justify-center">
+                    <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-blue-600"></div>
                 </div>
-                <CardTitle className="text-lg">{skill.name}</CardTitle>
-              </CardHeader>
-              {skill.description && (
-                <CardContent className="pt-0">
-                  <p className="text-sm text-gray-600">{skill.description}</p>
-                </CardContent>
-              )}
-            </Card>
-          ))}
-        </div>
+            </AppLayout>
+        );
+    }
 
-        {/* React Flow Graph */}
-        <Card className="flex-1 min-h-0">
-          <CardContent className="p-0 h-full">
-            <ReactFlow
-              nodes={nodes}
-              edges={edges}
-              onNodesChange={onNodesChange}
-              onEdgesChange={onEdgesChange}
-              onConnect={onConnect}
-              onNodeDragStop={onNodeDragStop}
-              nodeTypes={nodeTypes}
-              fitView
-              attributionPosition="bottom-left"
-            >
-              <Controls />
-              <MiniMap />
-              <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
-            </ReactFlow>
-          </CardContent>
-        </Card>
-      </div>
-    </AppLayout>
-  );
-} 
+    return (
+        <AppLayout>
+            <Head title="Skill Graph" />
+
+            <div className="flex h-[calc(100vh-theme(spacing.16))] flex-col space-y-6">
+                {/* Header */}
+                <div className="flex flex-shrink-0 items-center justify-between">
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-900">Skill Graph</h1>
+                        <p className="text-gray-600">Visualize your learning journey and skill dependencies</p>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                        <Select value={selectedSkill} onValueChange={setSelectedSkill}>
+                            <SelectTrigger className="w-48">
+                                <SelectValue placeholder="Select skill" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Skills</SelectItem>
+                                {skills.map((skill) => (
+                                    <SelectItem key={skill.id} value={skill.id.toString()}>
+                                        <div className="flex items-center space-x-2">
+                                            <div className="h-3 w-3 rounded-full" style={{ backgroundColor: skill.color }} />
+                                            <span>{skill.name}</span>
+                                        </div>
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <Button onClick={() => router.visit('/skills')}>
+                            <Settings className="mr-2 h-4 w-4" />
+                            Manage Skills
+                        </Button>
+                        <Button onClick={() => router.visit('/activities')}>
+                            <Plus className="mr-2 h-4 w-4" />
+                            Manage Activities
+                        </Button>
+                    </div>
+                </div>
+
+                {/* Skills Overview */}
+                <div className="grid flex-shrink-0 grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+                    {skills.map((skill) => (
+                        <Card key={skill.id} className="cursor-pointer transition-shadow hover:shadow-md">
+                            <CardHeader className="pb-3">
+                                <div className="flex items-center justify-between">
+                                    <div className="h-4 w-4 rounded-full" style={{ backgroundColor: skill.color }} />
+                                    <Badge variant="secondary">{skill.activities_count}</Badge>
+                                </div>
+                                <CardTitle className="text-lg">{skill.name}</CardTitle>
+                            </CardHeader>
+                            {skill.description && (
+                                <CardContent className="pt-0">
+                                    <p className="text-sm text-gray-600">{skill.description}</p>
+                                </CardContent>
+                            )}
+                        </Card>
+                    ))}
+                </div>
+
+                {/* React Flow Graph */}
+                <Card className="min-h-0 flex-1">
+                    <CardContent className="h-full p-0">
+                        <ReactFlow
+                            nodes={nodes}
+                            edges={edges}
+                            onNodesChange={onNodesChange}
+                            onEdgesChange={onEdgesChange}
+                            onConnect={onConnect}
+                            onNodeDragStop={onNodeDragStop}
+                            nodeTypes={nodeTypes}
+                            fitView
+                            attributionPosition="bottom-left"
+                        >
+                            <Controls />
+                            <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
+                        </ReactFlow>
+                    </CardContent>
+                </Card>
+            </div>
+        </AppLayout>
+    );
+}

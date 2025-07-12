@@ -30,6 +30,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::prefix('api')->group(function () {
     Route::apiResource('skills', SkillController::class);
+    Route::patch('skills/{skill}/position', [SkillController::class, 'updatePosition']);
     Route::apiResource('activities', ActivityController::class);
     Route::patch('activities/{activity}/position', [ActivityController::class, 'updatePosition']);
 });

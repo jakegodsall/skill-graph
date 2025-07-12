@@ -228,13 +228,13 @@ class ActivityController extends Controller
                 'position_x' => 'required|numeric',
                 'position_y' => 'required|numeric',
             ]);
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'Validation failed',
                 'errors' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
-            \Log::error('Activity position update error:', [
+            Log::error('Activity position update error:', [
                 'error' => $e->getMessage(),
                 'request_data' => $request->all(),
                 'user_id' => Auth::id(),
@@ -245,6 +245,8 @@ class ActivityController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+
+        Log::info("position_x: {$request->position_x}, position_y: {$request->position_y}");
 
         $activity->update([
             'position_x' => $request->position_x,
