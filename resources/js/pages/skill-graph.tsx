@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import {
   ReactFlow,
   MiniMap,
@@ -21,7 +21,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, BookOpen, Code, Award, FileText, Target, Zap } from 'lucide-react';
+import { Plus, BookOpen, Code, Award, FileText, Target, Zap, Settings } from 'lucide-react';
 
 import CourseNode from '@/components/flow-nodes/course-node';
 import ProjectNode from '@/components/flow-nodes/project-node';
@@ -230,9 +230,13 @@ export default function SkillGraph() {
                 ))}
               </SelectContent>
             </Select>
-            <Button>
+            <Button onClick={() => router.visit('/skills')}>
+              <Settings className="w-4 h-4 mr-2" />
+              Manage Skills
+            </Button>
+            <Button onClick={() => router.visit('/activities')}>
               <Plus className="w-4 h-4 mr-2" />
-              Add Activity
+              Manage Activities
             </Button>
           </div>
         </div>
