@@ -2,9 +2,9 @@ import React from 'react';
 import { Handle, Position } from 'reactflow';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookOpen, ExternalLink } from 'lucide-react';
+import { Award, ExternalLink } from 'lucide-react';
 
-interface CourseNodeProps {
+interface CertificationNodeProps {
   data: {
     id: number;
     name: string;
@@ -19,7 +19,7 @@ interface CourseNodeProps {
   };
 }
 
-export default function CourseNode({ data }: CourseNodeProps) {
+export default function CertificationNode({ data }: CertificationNodeProps) {
   const handleClick = () => {
     if (data.url) {
       window.open(data.url, '_blank');
@@ -33,7 +33,7 @@ export default function CourseNode({ data }: CourseNodeProps) {
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <BookOpen className="w-4 h-4 text-blue-600" />
+            <Award className="w-4 h-4 text-yellow-600" />
             <div
               className="w-3 h-3 rounded-full"
               style={{ backgroundColor: data.skill.color }}
@@ -66,4 +66,4 @@ export default function CourseNode({ data }: CourseNodeProps) {
       <Handle type="source" position={Position.Bottom} />
     </Card>
   );
-}
+} 
