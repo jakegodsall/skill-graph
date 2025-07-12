@@ -23,6 +23,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('activities', function () {
         return Inertia::render('activities/index');
     })->name('activities.index');
+    
+    // API routes with web middleware
+    Route::prefix('api')->group(function () {
+        Route::apiResource('skills', \App\Http\Controllers\SkillController::class);
+        Route::apiResource('activities', \App\Http\Controllers\ActivityController::class);
+        Route::patch('activities/{activity}/position', [\App\Http\Controllers\ActivityController::class, 'updatePosition']);
+    });
 });
 
 require __DIR__.'/settings.php';

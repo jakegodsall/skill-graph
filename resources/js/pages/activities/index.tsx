@@ -130,11 +130,15 @@ export default function ActivitiesIndex() {
     setFormErrors({});
 
     const payload = {
-      ...formData,
+      name: formData.name,
+      description: formData.description || null,
+      type: formData.type,
+      status: formData.status,
+      url: formData.url || null,
       estimated_hours: formData.estimated_hours ? parseInt(formData.estimated_hours) : null,
       actual_hours: formData.actual_hours ? parseInt(formData.actual_hours) : null,
       skill_id: parseInt(formData.skill_id),
-      dependencies: formData.dependencies.map(id => parseInt(id))
+      dependencies: formData.dependencies.length > 0 ? formData.dependencies.map(id => parseInt(id)) : []
     };
 
     try {
@@ -171,11 +175,15 @@ export default function ActivitiesIndex() {
     setFormErrors({});
 
     const payload = {
-      ...formData,
+      name: formData.name,
+      description: formData.description || null,
+      type: formData.type,
+      status: formData.status,
+      url: formData.url || null,
       estimated_hours: formData.estimated_hours ? parseInt(formData.estimated_hours) : null,
       actual_hours: formData.actual_hours ? parseInt(formData.actual_hours) : null,
       skill_id: parseInt(formData.skill_id),
-      dependencies: formData.dependencies.map(id => parseInt(id))
+      dependencies: formData.dependencies.length > 0 ? formData.dependencies.map(id => parseInt(id)) : []
     };
 
     try {

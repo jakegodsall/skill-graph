@@ -72,7 +72,6 @@ export default function SkillsIndex() {
     }
   };
 
-  // Handle create skill
   const handleCreateSkill = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormErrors({});
@@ -103,7 +102,6 @@ export default function SkillsIndex() {
     }
   };
 
-  // Handle edit skill
   const handleEditSkill = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingSkill) return;

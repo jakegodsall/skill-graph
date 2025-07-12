@@ -29,6 +29,7 @@ import BookNode from '@/components/flow-nodes/book-node';
 import PracticeNode from '@/components/flow-nodes/practice-node';
 import CertificationNode from '@/components/flow-nodes/certification-node';
 import OtherNode from '@/components/flow-nodes/other-node';
+import SkillNode from '@/components/flow-nodes/skill-node';
 
 interface Skill {
   id: number;
@@ -54,6 +55,7 @@ interface Activity {
 }
 
 const nodeTypes: NodeTypes = {
+  skill: SkillNode,
   course: CourseNode,
   project: ProjectNode,
   book: BookNode,
@@ -115,39 +117,97 @@ export default function SkillGraph() {
 
   // Convert activities to nodes and edges
   const convertToNodesAndEdges = useCallback(() => {
-    const newNodes: Node[] = activities.map((activity) => ({
-      id: activity.id.toString(),
-      type: activity.type,
-      position: {
-        x: activity.position_x || Math.random() * 400,
-        y: activity.position_y || Math.random() * 400,
-      },
-      data: {
-        ...activity,
-        label: activity.name,
-        icon: getNodeIcon(activity.type),
-        statusColor: getStatusColor(activity.status),
-      },
-    }));
-
-    const newEdges: Edge[] = activities.flatMap((activity) =>
-      activity.depends_on.map((dependency) => ({
-        id: `${dependency.id}-${activity.id}`,
-        source: dependency.id.toString(),
-        target: activity.id.toString(),
-        type: 'smoothstep',
-        animated: activity.status === 'in_progress',
-        style: { stroke: activity.skill.color },
-      }))
+    // Get unique skills from activities
+    const uniqueSkills = Array.from(
+      new Map(activities.map(activity => [activity.skill_id, activity.skill])).values()
     );
 
-    setNodes(newNodes);
+    // Create skill nodes
+    const skillNodes: Node[] = uniqueSkills.map((skill, index) => {
+      const skillActivities = activities.filter(activity => activity.skill_id === skill.id);
+      
+      // Position skill nodes in a column on the left side
+      return {
+        id: `skill-${skill.id}`,
+        type: 'skill',
+        position: {
+          x: 50,
+          y: 50 + (index * 250), // Space skill nodes vertically
+        },
+        data: {
+          ...skill,
+          activities_count: skillActivities.length,
+        },
+      };
+    });
+
+    // Create activity nodes
+    const activityNodes: Node[] = activities.map((activity, index) => {
+      const skillIndex = uniqueSkills.findIndex(skill => skill.id === activity.skill_id);
+      
+      return {
+        id: activity.id.toString(),
+        type: activity.type,
+        position: {
+          x: activity.position_x || (300 + Math.random() * 300), // Position to the right of skill nodes
+          y: activity.position_y || (50 + (skillIndex * 250) + Math.random() * 200),
+        },
+        data: {
+          ...activity,
+          label: activity.name,
+          icon: getNodeIcon(activity.type),
+          statusColor: getStatusColor(activity.status),
+        },
+      };
+    });
+
+    // Create edges
+    const newEdges: Edge[] = [];
+
+    // Add activity dependency edges
+    activities.forEach((activity) => {
+      activity.depends_on.forEach((dependency) => {
+        newEdges.push({
+          id: `${dependency.id}-${activity.id}`,
+          source: dependency.id.toString(),
+          target: activity.id.toString(),
+          type: 'smoothstep',
+          animated: activity.status === 'in_progress',
+          style: { stroke: activity.skill.color },
+        });
+      });
+    });
+
+    // Add skill-to-activity edges for activities with no dependencies
+    activities.forEach((activity) => {
+      if (activity.depends_on.length === 0) {
+        newEdges.push({
+          id: `skill-${activity.skill_id}-${activity.id}`,
+          source: `skill-${activity.skill_id}`,
+          target: activity.id.toString(),
+          type: 'smoothstep',
+          animated: activity.status === 'in_progress',
+          style: { 
+            stroke: activity.skill.color,
+            strokeWidth: 3, // Make skill connections more prominent
+            strokeDasharray: '5,5', // Dashed line to distinguish from activity dependencies
+          },
+        });
+      }
+    });
+
+    setNodes([...skillNodes, ...activityNodes]);
     setEdges(newEdges);
   }, [activities, setNodes, setEdges]);
 
   // Handle node drag end (save position)
   const onNodeDragStop = useCallback(
     async (event: React.MouseEvent, node: Node) => {
+      // Only save positions for activity nodes, not skill nodes
+      if (node.id.startsWith('skill-')) {
+        return;
+      }
+
       try {
         await fetch(`/api/activities/${node.id}/position`, {
           method: 'PATCH',

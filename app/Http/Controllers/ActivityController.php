@@ -8,13 +8,11 @@ use App\Models\Skill;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ActivityController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
+    // Authentication handled by web middleware group
 
     public function index(Request $request)
     {
@@ -32,27 +30,36 @@ class ActivityController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'type' => 'required|in:course,project,book,practice,certification,other',
-            'skill_id' => 'required|exists:skills,id',
-            'url' => 'nullable|url',
-            'status' => 'in:not_started,in_progress,completed,paused',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-            'estimated_hours' => 'nullable|integer|min:0',
-            'actual_hours' => 'nullable|integer|min:0',
-            'metadata' => 'nullable|json',
-            'position_x' => 'nullable|numeric',
-            'position_y' => 'nullable|numeric',
-            'dependencies' => 'nullable|array',
-            'dependencies.*' => 'exists:activities,id',
-        ]);
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'type' => 'required|in:course,project,book,practice,certification,other',
+                'skill_id' => 'required|integer|exists:skills,id',
+                'url' => 'nullable|url',
+                'status' => 'nullable|in:not_started,in_progress,completed,paused',
+                'start_date' => 'nullable|date',
+                'end_date' => 'nullable|date|after_or_equal:start_date',
+                'estimated_hours' => 'nullable|integer|min:0',
+                'actual_hours' => 'nullable|integer|min:0',
+                'metadata' => 'nullable|json',
+                'position_x' => 'nullable|numeric',
+                'position_y' => 'nullable|numeric',
+                'dependencies' => 'nullable|array',
+                'dependencies.*' => 'integer|exists:activities,id',
+            ]);
 
-        // Check that skill belongs to user
-        $skill = Skill::findOrFail($request->skill_id);
-        $this->authorize('view', $skill);
+            // Check that skill belongs to user
+            $skill = Skill::findOrFail($request->skill_id);
+            $this->authorize('view', $skill);
+        } catch (\Exception $e) {
+            \Log::error('Activity creation validation/authorization error:', [
+                'error' => $e->getMessage(),
+                'request_data' => $request->all(),
+                'user_id' => Auth::id()
+            ]);
+            throw $e;
+        }
 
         DB::transaction(function () use ($request, &$activity) {
             $activity = Auth::user()->activities()->create([

@@ -9,10 +9,7 @@ use Illuminate\Validation\Rule;
 
 class SkillController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
+    // Authentication handled by web middleware group
 
     public function index()
     {
