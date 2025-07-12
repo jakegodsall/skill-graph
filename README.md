@@ -85,23 +85,52 @@ A web application for managing skills and learning activities with an interactiv
    - Open http://localhost:8000 in your browser
    - Register a new account or use seeded credentials
 
-### Docker Development (Optional)
+### Docker Development (Recommended)
 
-If you prefer containerized development:
+The application includes a complete Docker environment with MySQL database:
 
 ```bash
-# Start all services
-docker-compose up -d
+# Clone the repository
+git clone https://github.com/yourusername/skill-graph.git
+cd skill-graph
 
-# Install dependencies
-docker-compose exec php composer install
-docker-compose exec php npm install
+# Copy Docker environment file
+cp .env.docker .env
 
-# Run migrations
-docker-compose exec php php artisan migrate
+# Build and start all services
+docker-compose up -d --build
 
-# Start frontend development
-docker-compose exec php npm run dev
+# The application will be available at:
+# - App: http://localhost:8000
+# - PhpMyAdmin: http://localhost:8080
+# - Vite Dev Server: http://localhost:5173
+```
+
+**Docker Services:**
+- **app**: Laravel application (PHP 8.2, Nginx, Supervisor)
+- **mysql**: MySQL 8.0 database
+- **phpmyadmin**: Database management interface
+- **node**: Node.js for frontend development (Vite)
+
+**Docker Commands:**
+```bash
+# Using Makefile (recommended)
+make help        # Show all available commands
+make setup       # First-time setup (build, up, migrate)
+make up          # Start all services
+make down        # Stop all services
+make logs        # View application logs
+make shell       # Access application shell
+make migrate     # Run database migrations
+make test        # Run tests
+
+# Using docker-compose directly
+docker-compose logs -f app
+docker-compose exec app php artisan migrate
+docker-compose exec app php artisan tinker
+docker-compose exec node npm run build
+docker-compose down
+docker-compose up -d --build
 ```
 
 ## 📱 Usage

@@ -1,0 +1,57 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Documentation
+README.md
+*.md
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Laravel
+/storage/logs/*.log
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/bootstrap/cache/*
+.env
+.env.backup
+.env.production
+
+# Testing
+/tests
+.phpunit.result.cache
+phpunit.xml
+pest.xml
+
+# Composer
+/vendor
+
+# Public assets (will be built in container)
+/public/build
+/public/hot
+/public/storage
+
+# Temporary files
+*.tmp
+*.temp
+*.log 
