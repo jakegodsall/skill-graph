@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     build:
@@ -38,22 +36,6 @@ services:
       - mysql-data:/var/lib/mysql
     networks:
       - skill-graph-network
-
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin:latest
-    container_name: skill-graph-phpmyadmin
-    restart: unless-stopped
-    ports:
-      - "8080:80"
-    environment:
-      PMA_HOST: mysql
-      PMA_PORT: 3306
-      PMA_USER: root
-      PMA_PASSWORD: root_password
-    networks:
-      - skill-graph-network
-    depends_on:
-      - mysql
 
 volumes:
   mysql-data:
