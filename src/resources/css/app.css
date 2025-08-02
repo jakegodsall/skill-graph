@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --primary-blue: #3532D9;
+    --secondary-blue: #F2FDFF;
+
+    --primary-grey: #676767;
+    --secondary-grey: #D9D9D9;
+    --tertiary-grey: #FAFAFA;
+}
+
+
+[x-cloak] {
+    display: none !important;
+}

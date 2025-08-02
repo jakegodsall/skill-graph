@@ -1,224 +1,66 @@
-# Skill Graph
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-A web application for managing skills and learning activities with an interactive visual graph interface. Track your learning journey, organize activities by skills, and visualize dependencies between different learning resources.
+<p align="center">
+<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+</p>
 
-## ✨ Features
+## About Laravel
 
-### 🎯 Core Functionality
-- **Skill Management**: Create, edit, and organize skills with custom colors and descriptions
-- **Activity Tracking**: Manage learning activities (courses, projects, books, certifications, etc.)
-- **Visual Graph Interface**: Interactive drag-and-drop skill graph with React Flow
-- **Dependency Management**: Define prerequisites and learning paths between activities
-- **Progress Tracking**: Monitor activity status and learning progress
+Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-## 🛠️ Tech Stack
+- [Simple, fast routing engine](https://laravel.com/docs/routing).
+- [Powerful dependency injection container](https://laravel.com/docs/container).
+- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+- [Robust background job processing](https://laravel.com/docs/queues).
+- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-### Backend
-- **Laravel 12**: Modern PHP framework with latest features
-- **MySQL/SQLite**: Database with Eloquent ORM
-- **Inertia.js**: Full-stack framework bridging Laravel and React
-- **Spatie Permissions**: Role and permission management
+Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-### Frontend
-- **React 18**: Modern React with hooks and TypeScript
-- **TypeScript**: Type-safe development
-- **Tailwind CSS**: Utility-first CSS framework
-- **React Flow**: Interactive graph visualization
-- **Shadcn/UI**: Modern component library
-- **Lucide Icons**: Beautiful icon set
+## Learning Laravel
 
-### Development Tools
-- **Vite**: Fast build tool and development server
-- **Laravel Breeze**: Authentication scaffolding
-- **Docker Compose**: Containerized development environment
-- **Pest**: Modern PHP testing framework
+Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
 
-## 🚀 Installation
+You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
 
-### Prerequisites
-- PHP 8.2+
-- Composer
-- Node.js 18+
-- npm/yarn
-- Docker (optional, for containerized development)
+If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-### Quick Start
+## Laravel Sponsors
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/skill-graph.git
-   cd skill-graph
-   ```
+We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
 
-2. **Install PHP dependencies**
-   ```bash
-   composer install
-   ```
+### Premium Partners
 
-3. **Install JavaScript dependencies**
-   ```bash
-   npm install
-   ```
+- **[Vehikl](https://vehikl.com/)**
+- **[Tighten Co.](https://tighten.co)**
+- **[WebReinvent](https://webreinvent.com/)**
+- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+- **[64 Robots](https://64robots.com)**
+- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
+- **[Cyber-Duck](https://cyber-duck.co.uk)**
+- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
+- **[Jump24](https://jump24.co.uk)**
+- **[Redberry](https://redberry.international/laravel/)**
+- **[Active Logic](https://activelogic.com)**
+- **[byte5](https://byte5.de)**
+- **[OP.GG](https://op.gg)**
 
-4. **Environment setup**
-   ```bash
-   cp .env.example .env
-   php artisan key:generate
-   ```
+## Contributing
 
-5. **Database setup**
-   ```bash
-   php artisan migrate
-   php artisan db:seed
-   ```
+Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-6. **Start development servers**
-   ```bash
-   # Terminal 1: Laravel development server
-   php artisan serve
+## Code of Conduct
 
-   # Terminal 2: Vite development server
-   npm run dev
-   ```
+In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
 
-7. **Access the application**
-   - Open http://localhost:8000 in your browser
-   - Register a new account or use seeded credentials
+## Security Vulnerabilities
 
-### Docker Development (Recommended)
+If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-The application includes a complete Docker environment with MySQL database:
+## License
 
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/skill-graph.git
-cd skill-graph
-
-# Copy Docker environment file
-cp .env.docker .env
-
-# Build and start all services
-docker-compose up -d --build
-
-# The application will be available at:
-# - App: http://localhost:8000
-# - PhpMyAdmin: http://localhost:8080
-# - Vite Dev Server: http://localhost:5173
-```
-
-**Docker Services:**
-- **app**: Laravel application (PHP 8.2, Nginx, Supervisor)
-- **mysql**: MySQL 8.0 database
-- **phpmyadmin**: Database management interface
-- **node**: Node.js for frontend development (Vite)
-
-**Docker Commands:**
-```bash
-# Using Makefile (recommended)
-make help        # Show all available commands
-make setup       # First-time setup (build, up, migrate)
-make up          # Start all services
-make down        # Stop all services
-make logs        # View application logs
-make shell       # Access application shell
-make migrate     # Run database migrations
-make test        # Run tests
-
-# Using docker-compose directly
-docker-compose logs -f app
-docker-compose exec app php artisan migrate
-docker-compose exec app php artisan tinker
-docker-compose exec node npm run build
-docker-compose down
-docker-compose up -d --build
-```
-
-## 📱 Usage
-
-### Getting Started
-1. **Register an Account**: Create your personal account
-2. **Create Skills**: Add skills you want to learn (e.g., "React", "Laravel", "Machine Learning")
-3. **Add Activities**: Create learning activities within each skill
-4. **Set Dependencies**: Define prerequisites between activities
-5. **Visualize Progress**: Use the skill graph to see your learning journey
-
-### Skill Management
-- **Create Skills**: Add new skills with names, descriptions, and custom colors
-- **Edit Skills**: Update skill information and visual appearance
-- **Delete Skills**: Remove skills and their associated activities
-
-### Activity Management
-- **Activity Types**: Courses, Projects, Books, Practice, Certifications, Other
-- **Status Tracking**: Not Started, In Progress, Completed, Paused
-- **Time Estimation**: Set estimated and actual hours
-- **Dependencies**: Link activities to create learning paths
-- **Metadata**: Store additional information in JSON format
-
-### Visual Graph Interface
-- **Interactive Canvas**: Full-screen drag-and-drop interface
-- **Skill Nodes**: Visual representation of skills as root nodes
-- **Activity Connections**: Dependencies shown as connecting lines
-- **Real-time Updates**: Changes reflect immediately across all views
-- **Persistent Positions**: Node positions saved automatically
-
-## 🏗️ Project Structure
-
-```
-skill-graph/
-├── app/
-│   ├── Http/Controllers/     # API Controllers
-│   ├── Models/              # Eloquent Models
-│   └── Policies/            # Authorization Policies
-├── database/
-│   ├── migrations/          # Database Migrations
-│   └── factories/           # Model Factories
-├── resources/
-│   ├── js/
-│   │   ├── components/      # React Components
-│   │   ├── pages/          # Page Components
-│   │   └── types/          # TypeScript Types
-│   └── views/              # Blade Templates
-├── routes/
-│   ├── web.php             # Web Routes
-│   └── auth.php            # Authentication Routes
-└── tests/                  # Test Files
-```
-
-## 🧪 Testing
-
-Run the test suite:
-
-```bash
-# PHP tests
-php artisan test
-
-# JavaScript tests (if configured)
-npm run test
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Development Guidelines
-- Follow PSR-12 coding standards for PHP
-- Use TypeScript for all new frontend code
-- Write tests for new features
-- Update documentation as needed
-- Ensure all tests pass before submitting
-
-## 📋 Requirements
-
-- PHP 8.2 or higher
-- Laravel 11+
-- Node.js 18+
-- MySQL 8.0+ or SQLite 3.35+
-- Composer 2.0+
-
-## 📄 License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

@@ -1,46 +1,60 @@
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: skill-graph-app
-    restart: unless-stopped
-    working_dir: /var/www/html
-    volumes:
-      - ./:/var/www/html
-      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
-    networks:
-      - skill-graph-network
-    depends_on:
-      - mysql
-    environment:
-      - DB_HOST=mysql
-      - DB_DATABASE=skill_graph
-      - DB_USERNAME=skill_graph_user
-      - DB_PASSWORD=skill_graph_password
-    ports:
-      - "8000:8000"
-
-  mysql:
-    image: mysql:8.0
-    container_name: skill-graph-mysql
-    restart: unless-stopped
+  db:
+    image: mysql:8.0.32
     ports:
       - "3306:3306"
-    environment:
-      MYSQL_DATABASE: skill_graph
-      MYSQL_USER: skill_graph_user
-      MYSQL_PASSWORD: skill_graph_password
-      MYSQL_ROOT_PASSWORD: root_password
     volumes:
-      - mysql-data:/var/lib/mysql
+      - dev_db_store:/var/lib/mysql
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: dev
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
     networks:
-      - skill-graph-network
-
-volumes:
-  mysql-data:
-    driver: local
+      - app_network
+  nginx:
+    depends_on:
+      - db
+    build:
+      context: ./
+      dockerfile: ./build/docker/nginx/Dockerfile
+    deploy:
+      replicas: 1
+    volumes:
+      - ./src:/var/www/html
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - app_network
+    links:
+      - php
+  php:
+    depends_on:
+      - db
+    build:
+      context: ./
+      dockerfile: ./build/docker/php/Dockerfile
+    user: "1000:1000"
+    environment:
+      - npm_config_cache=/var/www/html/.npm
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1024M
+    volumes:
+      - ./src:/var/www/html
+    networks:
+      - app_network
+    ports:
+      - "5173:5173"
 
 networks:
-  skill-graph-network:
-    driver: bridge 
+  app_network:
+volumes:
+  dev_db_store:
