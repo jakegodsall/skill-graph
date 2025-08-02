@@ -1,0 +1,1 @@
+import{c as n}from"./app-logo-icon-l3mS74g0.js";import{L as o}from"./app-CCnqF8J5.js";function c({className:e="",children:r,...t}){return React.createElement(o,{className:n("text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500",e),...t},r)}export{c as T};

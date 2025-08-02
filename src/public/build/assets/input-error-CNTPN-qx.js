@@ -1,0 +1,1 @@
+import{c as n}from"./app-logo-icon-l3mS74g0.js";function c({message:t,className:r="",...e}){return t?React.createElement("p",{...e,className:n("text-sm text-red-600 dark:text-red-400",r)},t):null}export{c as I};
